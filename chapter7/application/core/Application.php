@@ -83,15 +83,22 @@ class Application {
         //それらの値を元に、runAction()メソッドを呼び出しアクションを実行する。
         //run()メソッドはアプリケーションがユーザーのリクエストに対応するためのトリガーとなるメソッド。
         public function run() {
-                $params = $this->router->resolve($this->request->getPathInfo());
-                if($params === false) {
-                        // to-do A（ルーティングに一致しなかった場合の例外処理）
+                try {
+                        $params = $this->router->resolve($this->request->getPathInfo());
+                        if($params === false) {
+                                // to-do A（ルーティングに一致しなかった場合の例外処理）
+                                // 第一引数はエラーメッセージ。
+                                throw new HttpNotFoundException('No route founr for' . $this->request->getPathInfo());
+                        }
+
+                        $controller = $params['controller'];
+                        $action = $params['action'];
+
+                        $this->runAction($controller, $action, $params);
+                } catch (HttpNotFoundException $e){
+                        $this->render404Page($e);
+
                 }
-
-                $controller = $params['controller'];
-                $action = $params['action'];
-
-                $this->runAction($controller, $action, $params);
 
                 $this->response->send();
         }
@@ -103,6 +110,7 @@ class Application {
 
                 if ($controller === false) {
                         // to-do B（ルーティングに一致しなかった場合の例外処理）
+                        throw new HttpNotFoundException($controller_class . 'controller is not found');
                 }
 
                 $content = $controller->run($action, $params);
@@ -129,6 +137,27 @@ class Application {
 
                 return new $controller_class($this);
 
+        }
+
+        protected function render404Page($e) {
+                $this->response->setStatusCode(404, 'Not Found');
+                $message = $this->isDebugMode() ? $e->getMessage() : 'Page not found.';
+                $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+
+                $this->response->setContent(<<<EOF
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+        <title>404</html>
+</head>
+<body>
+        {$message}
+</body>
+</html>
+EOF
+                );
         }
 }
 ?>
