@@ -1,11 +1,12 @@
 <?php
 
-class Application {
+abstract class Application {
         protected $debug = false;
         protected $request;
         protected $response;
         protected $session;
         protected $db_manager;
+        protected $login_action = array();
 
         public function __constract($debug = false) {
                 $this -> setDebugMode($debug);
@@ -98,6 +99,10 @@ class Application {
                 } catch (HttpNotFoundException $e){
                         $this->render404Page($e);
 
+                } catch (UnauthorizedActionException $e){
+                        //ログイン画面のアクションを実行する。
+                        list($controller, $action) = $this->login_action;
+                        $this->runAction($controller, $action;)
                 }
 
                 $this->response->send();
