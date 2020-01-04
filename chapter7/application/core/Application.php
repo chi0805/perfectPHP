@@ -102,7 +102,7 @@ abstract class Application {
                 } catch (UnauthorizedActionException $e){
                         //ログイン画面のアクションを実行する。
                         list($controller, $action) = $this->login_action;
-                        $this->runAction($controller, $action;)
+                        $this->runAction($controller, $action);
                 }
 
                 $this->response->send();
