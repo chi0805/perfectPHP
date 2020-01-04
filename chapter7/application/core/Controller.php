@@ -38,5 +38,26 @@ abstract class Controller {
 
                 return $content;
         }
+
+        protected function render($variables = array(), $template = null, $layout = 'layout') {
+                //Viewクラスのコンストラクタの第二引数に指定するデフォルト値の連想配列を指定する。
+                $defaults = array(
+                        'request' => $this->request,
+                        'base_url' => $this->request->getBaseUrl(),
+                        'session' => $this->session,
+                );
+
+                $view = new View($this->application->getViewDir(), $defaults);
+
+                //$template変数がnullの場合、アクション名をファイル名とする。
+                if(is_null($template)) {
+                        $template = $this->action_name;
+                }
+
+                $path = $this->controller_name . '/'. $template;
+
+                //ビューファイルの読み込みを行う。
+                return $view->render($path, $variables, $layout);
+        }
 }
 ?>
