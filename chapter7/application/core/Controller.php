@@ -11,7 +11,7 @@ abstract class Controller {
         protected $session;
         protected $db_manager;
 
-        public function __constract($Application) {
+        public function __construct($Application) {
                 //コントローラ名をクラス名から逆算してプロパティに設定。
                 //クラス名の後ろの"Controller"を取り除き、小文字にする。
                 $this->controller_name = strtolower(substr(get_class($this), 0, -10));
