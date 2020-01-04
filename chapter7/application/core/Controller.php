@@ -59,5 +59,25 @@ abstract class Controller {
                 //ビューファイルの読み込みを行う。
                 return $view->render($path, $variables, $layout);
         }
+
+        //アクション内でリクエストされた情報が存在しない場合、このメソッドを呼び出してエラー画面に遷移する。
+        protected function forward404() {
+                throw new HttpNotFoundException('Forwarded 404 page from' . $this->controller_name . '/' . $this->action_name)
+        }
+
+        //Responseオブジェクトにリダイレクトする。
+        //同じアプリケーション内で別アクションのリダイレクトを行う場合、PATH_INFOの部分のみ指定すればよい。
+        protected function redirect($url) {
+                if(!preg_match('#https?://#', $url)){
+                        $protocol = $this->request->isSsl ? 'https://' : 'http://';
+                        $host = $this->request->getHost();
+                        $base_url = $this->request->getBaseUrl();
+
+                        $url = $protocol . $host . $base_url . $url;
+                }
+
+                $this->response->setStatusCode(302, 'Found');
+                $this->response->setHttpHeader('Location', $url);
+        }
 }
 ?>
