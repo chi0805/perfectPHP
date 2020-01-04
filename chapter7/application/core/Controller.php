@@ -10,6 +10,7 @@ abstract class Controller {
         protected $response;
         protected $session;
         protected $db_manager;
+        protected $auth_actions = array(); //ログインが必要なアクション名を配列で指定する。
 
         public function __construct($Application) {
                 //コントローラ名をクラス名から逆算してプロパティに設定。
@@ -118,6 +119,36 @@ abstract class Controller {
 
                 return false;
         }
+
+        //ログイン画面
+
+        public function run($action, $params = array()) {
+                $this->action_name = $action;
+
+                $action_method = $action . 'Action';
+
+                if (!method_exists($this, $action_method)) {
+                        $this->foward404;
+                }
+
+                if ($this->needsAuthentication($action) && !$this->session->isAuthenticated()) {
+                        throw new UnauthorizedActionException();
+                }
+
+                $content = $this->$action_method($params);
+
+                return $content;
+        }
+
+        //ログインが必要かどうかを判定する。
+        protected function needsAuthentication($action) {
+                if($this->auth_action == true || (is_array($this->auth_actions) && in_array($action, $this->auth_actions))) {
+                        return true;
+                }
+ 
+                return false;
+        }
+
 
 }
 ?>
