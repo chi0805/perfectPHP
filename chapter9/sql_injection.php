@@ -16,7 +16,7 @@ function check_user($name, $pass) {
 
         //POSTの場合はログインチェック
         if (strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
-                $conn = mysqli_connect('localhost', 'root', 'Ms23021705@');
+                $conn = mysqli_connect('localhost', 'root', '');
                 mysqli_select_db('perfect');
                 $result = check_user($_POST['name'], $_POST['pass']);
                 if ($result === true) {
